@@ -1,7 +1,7 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
-export type UserRole = 'patient' | 'receptionist' | 'clinician' | 'pharmacy';
+export type UserRole = 'patient' | 'receptionist' | 'clinician' | 'pharmacy' | 'admin';
 
 export interface User {
   id: string;
@@ -50,6 +50,13 @@ const mockUsers: User[] = [
     email: 'pharmacy@example.com',
     role: 'pharmacy',
     profileImage: 'https://i.pravatar.cc/150?img=4'
+  },
+  {
+    id: '5',
+    name: 'Admin Superuser',
+    email: 'admin@example.com',
+    role: 'admin',
+    profileImage: 'https://i.pravatar.cc/150?img=5'
   }
 ];
 

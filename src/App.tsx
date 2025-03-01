@@ -41,6 +41,13 @@ import InventoryDashboard from "@/pages/inventory/InventoryDashboard";
 import PrescriptionsList from "@/pages/prescriptions/PrescriptionsList";
 import MessagesList from "@/pages/messages/MessagesList";
 
+// Admin Pages
+import AdminDashboard from "@/pages/admin/AdminDashboard";
+import HospitalStatistics from "@/pages/admin/HospitalStatistics";
+import UserManagement from "@/pages/admin/UserManagement";
+import SystemSettings from "@/pages/admin/SystemSettings";
+import AuditLogs from "@/pages/admin/AuditLogs";
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -88,6 +95,13 @@ const App = () => (
               
               {/* Profile Route */}
               <Route path="/profile" element={<Profile />} />
+              
+              {/* Admin Routes */}
+              <Route path="/admin" element={<AdminDashboard />} />
+              <Route path="/admin/statistics" element={<HospitalStatistics />} />
+              <Route path="/admin/users" element={<UserManagement />} />
+              <Route path="/admin/settings" element={<SystemSettings />} />
+              <Route path="/admin/audit" element={<AuditLogs />} />
             </Route>
             
             {/* Catch-all Route */}
