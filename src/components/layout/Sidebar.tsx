@@ -22,6 +22,9 @@ import {
   FileTextIcon,
   BarChartIcon,
   ClockIcon,
+  PillIcon,
+  PackageIcon,
+  MessageSquareIcon,
 } from 'lucide-react';
 
 const Sidebar = () => {
@@ -53,7 +56,16 @@ const Sidebar = () => {
       { icon: UsersIcon, label: 'Patients', path: '/patients' },
       { icon: CalendarIcon, label: 'Appointments', path: '/appointments' },
       { icon: ClipboardIcon, label: 'Medical Records', path: '/medical-records' },
+      { icon: PillIcon, label: 'Prescriptions', path: '/prescriptions' },
       { icon: BarChartIcon, label: 'Reports', path: '/reports' },
+      { icon: UserIcon, label: 'Profile', path: '/profile' },
+    ],
+    pharmacy: [
+      { icon: HomeIcon, label: 'Dashboard', path: '/dashboard' },
+      { icon: PillIcon, label: 'Medications', path: '/medications' },
+      { icon: PackageIcon, label: 'Inventory', path: '/inventory' },
+      { icon: ClipboardIcon, label: 'Prescriptions', path: '/prescriptions' },
+      { icon: MessageSquareIcon, label: 'Messages', path: '/messages' },
       { icon: UserIcon, label: 'Profile', path: '/profile' },
     ],
   };
@@ -69,6 +81,7 @@ const Sidebar = () => {
             'bg-blue-100 text-blue-800': user.role === 'patient',
             'bg-purple-100 text-purple-800': user.role === 'receptionist',
             'bg-green-100 text-green-800': user.role === 'clinician',
+            'bg-orange-100 text-orange-800': user.role === 'pharmacy',
           })}>
             {user.role.charAt(0).toUpperCase() + user.role.slice(1)}
           </div>

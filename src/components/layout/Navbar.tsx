@@ -42,6 +42,7 @@ const Navbar = () => {
     patient: 'bg-blue-100 text-blue-800',
     receptionist: 'bg-purple-100 text-purple-800',
     clinician: 'bg-green-100 text-green-800',
+    pharmacy: 'bg-orange-100 text-orange-800',
   }[user?.role || 'patient'];
 
   return (

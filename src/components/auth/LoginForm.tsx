@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/components/ui/use-toast';
-import { LockIcon, MailIcon, UserIcon } from 'lucide-react';
+import { LockIcon, MailIcon, UserIcon, PillIcon } from 'lucide-react';
 
 const LoginForm = () => {
   const [email, setEmail] = useState('');
@@ -63,6 +63,10 @@ const LoginForm = () => {
         setEmail('clinician@example.com');
         setPassword('password');
         break;
+      case 'pharmacy':
+        setEmail('pharmacy@example.com');
+        setPassword('password');
+        break;
     }
   };
 
@@ -109,7 +113,7 @@ const LoginForm = () => {
         <div className="text-sm text-muted-foreground text-center">
           Demo Accounts (Click to autofill)
         </div>
-        <div className="flex justify-center gap-2 w-full">
+        <div className="grid grid-cols-2 gap-2 w-full">
           <Button 
             variant="outline" 
             size="sm" 
@@ -136,6 +140,15 @@ const LoginForm = () => {
           >
             <UserIcon className="mr-2 h-4 w-4" />
             Clinician
+          </Button>
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={() => handleDemoLogin('pharmacy')}
+            className="flex-1"
+          >
+            <PillIcon className="mr-2 h-4 w-4" />
+            Pharmacy
           </Button>
         </div>
       </CardFooter>

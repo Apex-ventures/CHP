@@ -35,6 +35,12 @@ import Reports from "@/pages/reports/Reports";
 // Profile Page
 import Profile from "@/pages/Profile";
 
+// Pharmacy Pages
+import MedicationsList from "@/pages/medications/MedicationsList";
+import InventoryDashboard from "@/pages/inventory/InventoryDashboard";
+import PrescriptionsList from "@/pages/prescriptions/PrescriptionsList";
+import MessagesList from "@/pages/messages/MessagesList";
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -70,6 +76,12 @@ const App = () => (
               {/* Medical Record Routes */}
               <Route path="/medical-records" element={<MedicalRecordsList />} />
               <Route path="/medical-records/:id" element={<MedicalRecordDetails />} />
+              
+              {/* Pharmacy Routes */}
+              <Route path="/medications" element={<MedicationsList />} />
+              <Route path="/inventory" element={<InventoryDashboard />} />
+              <Route path="/prescriptions" element={<PrescriptionsList />} />
+              <Route path="/messages" element={<MessagesList />} />
               
               {/* Report Routes */}
               <Route path="/reports" element={<Reports />} />
