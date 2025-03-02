@@ -16,7 +16,7 @@ const QueueHeader = ({ title, subtitle, userRole, onAddToQueue }: QueueHeaderPro
         <h1 className="text-2xl font-bold">{title}</h1>
         <p className="text-muted-foreground">{subtitle}</p>
       </div>
-      {(userRole === 'receptionist' || userRole === 'clinician') && (
+      {(userRole === 'receptionist' || userRole === 'clinician' || userRole === 'doctor' || userRole === 'admin') && (
         <Button onClick={onAddToQueue}>
           <UserPlus className="mr-2 h-4 w-4" />
           Add to Queue

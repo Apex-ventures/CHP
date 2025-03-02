@@ -80,8 +80,13 @@ const AddToQueueDialog = ({ open, onClose, onSubmit }: AddToQueueDialogProps) =>
   }, [selectedPatient, form]);
 
   const handleSubmit = (data: FormValues) => {
+    // Ensure all required fields are included and not optional
     onSubmit({
-      ...data,
+      patientId: data.patientId,
+      patientName: data.patientName,
+      condition: data.condition,
+      priority: data.priority,
+      notes: data.notes || '',
       arrivalTime: new Date().toISOString(),
       status: 'waiting',
     });

@@ -10,7 +10,7 @@ const Index = () => {
     navigate('/login');
   }, [navigate]);
 
-  return null;
+  return <div className="p-8">Redirecting to login...</div>;
 };
 
 export default Index;
