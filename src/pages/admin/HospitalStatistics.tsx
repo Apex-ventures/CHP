@@ -1,367 +1,329 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import {
-  ResponsiveContainer,
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  LineChart,
-  Line,
-  PieChart,
-  Pie,
-  Cell,
-  Treemap,
-} from 'recharts';
-import {
-  TableHead,
-  TableRow,
-  TableHeader,
-  TableCell,
-  TableBody,
-  Table,
-} from "@/components/ui/table";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell, Treemap } from 'recharts';
+
+const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8', '#82ca9d'];
+
+const diseaseData = [
+  { name: 'Hypertension', count: 1253, change: '+12%', department: 'Cardiology' },
+  { name: 'Diabetes', count: 985, change: '+8%', department: 'Endocrinology' },
+  { name: 'Respiratory Infections', count: 782, change: '-3%', department: 'Pulmonology' },
+  { name: 'Anxiety Disorders', count: 654, change: '+15%', department: 'Psychiatry' },
+  { name: 'Arthritis', count: 521, change: '+5%', department: 'Rheumatology' },
+  { name: 'Asthma', count: 423, change: '+2%', department: 'Pulmonology' }
+];
+
+const departmentPerformance = [
+  { name: 'Cardiology', patients: 2450, revenue: 520000, satisfaction: 87 },
+  { name: 'Orthopedics', patients: 1980, revenue: 475000, satisfaction: 84 },
+  { name: 'Pediatrics', patients: 2100, revenue: 320000, satisfaction: 91 },
+  { name: 'Neurology', patients: 1250, revenue: 380000, satisfaction: 82 },
+  { name: 'Oncology', patients: 980, revenue: 560000, satisfaction: 86 },
+  { name: 'OB/GYN', patients: 1760, revenue: 290000, satisfaction: 89 }
+];
+
+const monthlyRevenue = [
+  { month: 'Jan', revenue: 320000, patients: 1200 },
+  { month: 'Feb', revenue: 305000, patients: 1150 },
+  { month: 'Mar', revenue: 340000, patients: 1300 },
+  { month: 'Apr', revenue: 360000, patients: 1400 },
+  { month: 'May', revenue: 375000, patients: 1450 },
+  { month: 'Jun', revenue: 390000, patients: 1500 },
+  { month: 'Jul', revenue: 400000, patients: 1550 },
+  { month: 'Aug', revenue: 395000, patients: 1530 },
+  { month: 'Sep', revenue: 380000, patients: 1480 },
+  { month: 'Oct', revenue: 410000, patients: 1600 },
+  { month: 'Nov', revenue: 420000, patients: 1650 },
+  { month: 'Dec', revenue: 450000, patients: 1800 }
+];
+
+const patientDemographics = [
+  { name: '0-17', value: 15 },
+  { name: '18-34', value: 25 },
+  { name: '35-50', value: 30 },
+  { name: '51-65', value: 20 },
+  { name: '66+', value: 10 }
+];
 
 const HospitalStatistics = () => {
-  const [timeRange, setTimeRange] = useState("year");
-  const [department, setDepartment] = useState("all");
-
-  // Mock data for disease statistics
-  const diseaseData = [
-    { name: 'Hypertension', count: 468, change: '+12%', department: 'Cardiology' },
-    { name: 'Type 2 Diabetes', count: 362, change: '+8%', department: 'Endocrinology' },
-    { name: 'COVID-19', count: 289, change: '-22%', department: 'Infectious Disease' },
-    { name: 'Asthma', count: 256, change: '+5%', department: 'Pulmonology' },
-    { name: 'Depression', count: 243, change: '+18%', department: 'Psychiatry' },
-    { name: 'Osteoarthritis', count: 226, change: '+3%', department: 'Orthopedics' },
-    { name: 'COPD', count: 198, change: '+2%', department: 'Pulmonology' },
-    { name: 'Breast Cancer', count: 187, change: '+7%', department: 'Oncology' },
-    { name: 'Heart Failure', count: 176, change: '+4%', department: 'Cardiology' },
-    { name: 'Stroke', count: 165, change: '-3%', department: 'Neurology' },
-  ];
-
-  // Mock data for disease trends over time
-  const diseaseTrendData = [
-    { month: 'Jan', Hypertension: 38, Diabetes: 30, COVID: 42, Asthma: 20 },
-    { month: 'Feb', Hypertension: 40, Diabetes: 32, COVID: 36, Asthma: 22 },
-    { month: 'Mar', Hypertension: 45, Diabetes: 34, COVID: 31, Asthma: 24 },
-    { month: 'Apr', Hypertension: 48, Diabetes: 36, COVID: 28, Asthma: 25 },
-    { month: 'May', Hypertension: 52, Diabetes: 37, COVID: 26, Asthma: 26 },
-    { month: 'Jun', Hypertension: 54, Diabetes: 39, COVID: 24, Asthma: 28 },
-    { month: 'Jul', Hypertension: 58, Diabetes: 42, COVID: 22, Asthma: 29 },
-    { month: 'Aug', Hypertension: 59, Diabetes: 43, COVID: 20, Asthma: 28 },
-    { month: 'Sep', Hypertension: 60, Diabetes: 44, COVID: 19, Asthma: 26 },
-    { month: 'Oct', Hypertension: 62, Diabetes: 45, COVID: 18, Asthma: 24 },
-    { month: 'Nov', Hypertension: 64, Diabetes: 46, COVID: 18, Asthma: 22 },
-    { month: 'Dec', Hypertension: 65, Diabetes: 48, COVID: 17, Asthma: 21 },
-  ];
-
-  // Mock data for patient demographics
-  const ageDistributionData = [
-    { name: '0-12', value: 8 },
-    { name: '13-18', value: 5 },
-    { name: '19-35', value: 15 },
-    { name: '36-50', value: 22 },
-    { name: '51-65', value: 28 },
-    { name: '65+', value: 22 },
-  ];
-
-  // Mock data for hospitalization reasons
-  const hospitalizationData = [
-    { name: 'Cardiovascular', value: 28 },
-    { name: 'Respiratory', value: 18 },
-    { name: 'Digestive', value: 12 },
-    { name: 'Infectious', value: 10 },
-    { name: 'Neurological', value: 8 },
-    { name: 'Orthopedic', value: 7 },
-    { name: 'Cancer-related', value: 6 },
-    { name: 'Others', value: 11 },
-  ];
-
-  // Mock data for procedure effectiveness
-  const procedureData = [
-    { name: 'Cardiac Catheterization', success: 92, complications: 8 },
-    { name: 'Hip Replacement', success: 94, complications: 6 },
-    { name: 'Appendectomy', success: 97, complications: 3 },
-    { name: 'Spinal Fusion', success: 88, complications: 12 },
-    { name: 'Colonoscopy', success: 99, complications: 1 },
-    { name: 'CABG', success: 91, complications: 9 },
-  ];
-
-  const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8', '#82CA9D', '#ffc658', '#8dd1e1'];
-
   return (
-    <div className="container p-6 mx-auto">
-      <div className="flex justify-between items-center mb-8">
-        <div>
-          <h1 className="text-3xl font-bold">Hospital Statistics</h1>
-          <p className="text-muted-foreground">Comprehensive analysis of hospital performance and disease trends</p>
-        </div>
-        <div className="flex gap-4">
-          <div className="w-48">
-            <Label htmlFor="timeRange">Time Period</Label>
-            <Select value={timeRange} onValueChange={setTimeRange}>
-              <SelectTrigger id="timeRange">
-                <SelectValue placeholder="Select period" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="month">Last Month</SelectItem>
-                <SelectItem value="quarter">Last Quarter</SelectItem>
-                <SelectItem value="year">Last Year</SelectItem>
-                <SelectItem value="5year">Last 5 Years</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="w-48">
-            <Label htmlFor="department">Department</Label>
-            <Select value={department} onValueChange={setDepartment}>
-              <SelectTrigger id="department">
-                <SelectValue placeholder="Select department" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Departments</SelectItem>
-                <SelectItem value="cardiology">Cardiology</SelectItem>
-                <SelectItem value="neurology">Neurology</SelectItem>
-                <SelectItem value="orthopedics">Orthopedics</SelectItem>
-                <SelectItem value="oncology">Oncology</SelectItem>
-                <SelectItem value="pediatrics">Pediatrics</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
+    <div className="container mx-auto py-8">
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="text-3xl font-bold tracking-tight">Hospital Statistics</h1>
+        <Select defaultValue="year">
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="Select Period" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="month">This Month</SelectItem>
+            <SelectItem value="quarter">This Quarter</SelectItem>
+            <SelectItem value="year">This Year</SelectItem>
+            <SelectItem value="custom">Custom Range</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
+      
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium">Total Patients</CardTitle>
+            <CardDescription>For the current year</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">18,547</div>
+            <p className="text-xs text-muted-foreground mt-1">+12.5% from last year</p>
+          </CardContent>
+        </Card>
 
-      <Tabs defaultValue="disease-trends" className="mb-8">
-        <TabsList className="mb-4">
-          <TabsTrigger value="disease-trends">Disease Trends</TabsTrigger>
-          <TabsTrigger value="patient-demographics">Patient Demographics</TabsTrigger>
-          <TabsTrigger value="procedure-metrics">Procedure Metrics</TabsTrigger>
-          <TabsTrigger value="hospitalization">Hospitalization Data</TabsTrigger>
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium">Annual Revenue</CardTitle>
+            <CardDescription>For the current year</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">$4.2M</div>
+            <p className="text-xs text-muted-foreground mt-1">+8.3% from last year</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium">Patient Satisfaction</CardTitle>
+            <CardDescription>Average score</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">87%</div>
+            <p className="text-xs text-muted-foreground mt-1">+2.1% from last year</p>
+          </CardContent>
+        </Card>
+      </div>
+      
+      <Tabs defaultValue="diseases" className="space-y-8">
+        <TabsList className="grid w-full grid-cols-4">
+          <TabsTrigger value="diseases">Common Diseases</TabsTrigger>
+          <TabsTrigger value="departments">Department Performance</TabsTrigger>
+          <TabsTrigger value="revenue">Revenue Analysis</TabsTrigger>
+          <TabsTrigger value="demographics">Patient Demographics</TabsTrigger>
         </TabsList>
-
-        <TabsContent value="disease-trends">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <Card className="lg:col-span-2">
-              <CardHeader>
-                <CardTitle>Top 10 Most Frequent Diseases</CardTitle>
-                <CardDescription>Distribution of diagnoses in the last {timeRange}</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="h-96">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart
-                      data={diseaseData}
-                      layout="vertical"
-                      margin={{ top: 20, right: 30, left: 100, bottom: 5 }}
-                    >
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis type="number" />
-                      <YAxis type="category" dataKey="name" width={100} />
-                      <Tooltip />
-                      <Legend />
-                      <Bar dataKey="count" fill="#8884d8" name="Number of Cases" />
-                    </BarChart>
-                  </ResponsiveContainer>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Disease Distribution</CardTitle>
-                <CardDescription>By department</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="h-96">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <Treemap
-                      data={diseaseData}
-                      dataKey="count"
-                      ratio={4/3}
-                      stroke="#fff"
-                      fill="#8884d8"
-                      nameKey="name"
-                    >
-                      <Tooltip formatter={(value) => `${value} cases`} />
-                    </Treemap>
-                  </ResponsiveContainer>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          <Card className="mt-6">
+        
+        <TabsContent value="diseases">
+          <Card>
             <CardHeader>
-              <CardTitle>Disease Trends Over Time</CardTitle>
-              <CardDescription>Monthly tracking of top diseases</CardDescription>
+              <CardTitle>Most Common Diseases</CardTitle>
+              <CardDescription>
+                Analysis of disease prevalence over the last year
+              </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="h-96">
+              <div className="h-[400px]">
                 <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={diseaseTrendData}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="month" />
-                    <YAxis />
-                    <Tooltip />
-                    <Legend />
-                    <Line type="monotone" dataKey="Hypertension" stroke="#8884d8" activeDot={{ r: 8 }} strokeWidth={2} />
-                    <Line type="monotone" dataKey="Diabetes" stroke="#82ca9d" strokeWidth={2} />
-                    <Line type="monotone" dataKey="COVID" stroke="#ffc658" strokeWidth={2} />
-                    <Line type="monotone" dataKey="Asthma" stroke="#ff8042" strokeWidth={2} />
-                  </LineChart>
+                  <Treemap
+                    data={diseaseData}
+                    dataKey="count"
+                    stroke="#fff"
+                    fill="#8884d8"
+                    nameKey="name"
+                  >
+                    {diseaseData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    ))}
+                  </Treemap>
                 </ResponsiveContainer>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
+                {diseaseData.slice(0, 3).map((disease, index) => (
+                  <Card key={index} className="bg-muted/50">
+                    <CardContent className="p-4">
+                      <div className="flex justify-between items-center">
+                        <h4 className="font-medium">{disease.name}</h4>
+                        <span className={`text-sm ${disease.change.startsWith('+') ? 'text-green-500' : 'text-red-500'}`}>
+                          {disease.change}
+                        </span>
+                      </div>
+                      <div className="mt-1 flex justify-between items-center">
+                        <span className="text-sm text-muted-foreground">{disease.department}</span>
+                        <span className="font-bold">{disease.count} cases</span>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
               </div>
             </CardContent>
           </Card>
-
-          <Card className="mt-6">
-            <CardHeader>
-              <CardTitle>Detailed Disease Statistics</CardTitle>
-              <CardDescription>Analysis of disease prevalence and trends</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Disease</TableHead>
-                    <TableHead>Cases</TableHead>
-                    <TableHead>Department</TableHead>
-                    <TableHead>YoY Change</TableHead>
-                    <TableHead>Avg. Recovery Time</TableHead>
-                    <TableHead>Readmission Rate</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {diseaseData.slice(0, 6).map((disease, index) => (
-                    <TableRow key={index}>
-                      <TableCell className="font-medium">{disease.name}</TableCell>
-                      <TableCell>{disease.count}</TableCell>
-                      <TableCell>{disease.department}</TableCell>
-                      <TableCell className={disease.change.startsWith('+') ? 'text-green-600' : 'text-red-600'}>
-                        {disease.change}
-                      </TableCell>
-                      <TableCell>{Math.floor(Math.random() * 30) + 3} days</TableCell>
-                      <TableCell>{Math.floor(Math.random() * 20) + 1}%</TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-              <Button variant="outline" className="mt-4">View Full Report</Button>
-            </CardContent>
-          </Card>
         </TabsContent>
-
-        <TabsContent value="patient-demographics">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Patient Age Distribution</CardTitle>
-                <CardDescription>Breakdown by age group</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="h-80">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <PieChart>
-                      <Pie
-                        data={ageDistributionData}
-                        cx="50%"
-                        cy="50%"
-                        labelLine={true}
-                        outerRadius={100}
-                        fill="#8884d8"
-                        dataKey="value"
-                        label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
-                      >
-                        {ageDistributionData.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                        ))}
-                      </Pie>
-                      <Tooltip />
-                      <Legend />
-                    </PieChart>
-                  </ResponsiveContainer>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Additional demographic cards would go here */}
-          </div>
-        </TabsContent>
-
-        <TabsContent value="procedure-metrics">
+        
+        <TabsContent value="departments">
           <Card>
             <CardHeader>
-              <CardTitle>Procedure Success Rates</CardTitle>
-              <CardDescription>Analysis of medical procedures and their outcomes</CardDescription>
+              <CardTitle>Department Performance</CardTitle>
+              <CardDescription>
+                Comparison of patient load, revenue, and patient satisfaction
+              </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="h-80">
+              <div className="h-[400px]">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart
-                    data={procedureData}
+                    data={departmentPerformance}
                     margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
                   >
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="name" />
-                    <YAxis />
+                    <YAxis yAxisId="left" orientation="left" stroke="#8884d8" />
+                    <YAxis yAxisId="right" orientation="right" stroke="#82ca9d" />
                     <Tooltip />
                     <Legend />
-                    <Bar dataKey="success" stackId="a" fill="#82ca9d" name="Success Rate (%)" />
-                    <Bar dataKey="complications" stackId="a" fill="#ff8042" name="Complication Rate (%)" />
+                    <Bar yAxisId="left" dataKey="patients" fill="#8884d8" name="Patients" />
+                    <Bar yAxisId="right" dataKey="satisfaction" fill="#82ca9d" name="Satisfaction (%)" />
                   </BarChart>
                 </ResponsiveContainer>
+              </div>
+              
+              <div className="mt-6">
+                <h4 className="font-medium mb-3">Top Performing Departments</h4>
+                <div className="space-y-2">
+                  {departmentPerformance
+                    .sort((a, b) => b.satisfaction - a.satisfaction)
+                    .slice(0, 3)
+                    .map((dept, index) => (
+                      <div key={index} className="flex justify-between items-center p-3 bg-muted/50 rounded-lg">
+                        <div>
+                          <h5 className="font-medium">{dept.name}</h5>
+                          <p className="text-sm text-muted-foreground">{dept.patients} patients</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="font-medium">${(dept.revenue / 1000).toFixed(0)}k revenue</p>
+                          <p className="text-sm text-emerald-500">{dept.satisfaction}% satisfaction</p>
+                        </div>
+                      </div>
+                    ))}
+                </div>
               </div>
             </CardContent>
           </Card>
         </TabsContent>
-
-        <TabsContent value="hospitalization">
+        
+        <TabsContent value="revenue">
           <Card>
             <CardHeader>
-              <CardTitle>Reasons for Hospitalization</CardTitle>
-              <CardDescription>Primary causes for inpatient admissions</CardDescription>
+              <CardTitle>Revenue Analysis</CardTitle>
+              <CardDescription>
+                Monthly revenue and patient trends for the current year
+              </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="h-80">
+              <div className="h-[400px]">
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart
+                    data={monthlyRevenue}
+                    margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="month" />
+                    <YAxis yAxisId="left" orientation="left" stroke="#8884d8" />
+                    <YAxis yAxisId="right" orientation="right" stroke="#82ca9d" />
+                    <Tooltip formatter={(value, name) => {
+                      return name === 'revenue' ? `$${(value as number).toLocaleString()}` : value;
+                    }} />
+                    <Legend />
+                    <Line yAxisId="left" type="monotone" dataKey="revenue" stroke="#8884d8" name="Revenue ($)" />
+                    <Line yAxisId="right" type="monotone" dataKey="patients" stroke="#82ca9d" name="Patients" />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
+                <Card className="bg-muted/50">
+                  <CardContent className="p-4">
+                    <h4 className="font-medium">Total Annual Revenue</h4>
+                    <div className="text-2xl font-bold mt-1">
+                      ${monthlyRevenue.reduce((sum, item) => sum + item.revenue, 0).toLocaleString()}
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-1">+8.3% from last year</p>
+                  </CardContent>
+                </Card>
+                
+                <Card className="bg-muted/50">
+                  <CardContent className="p-4">
+                    <h4 className="font-medium">Average Monthly Revenue</h4>
+                    <div className="text-2xl font-bold mt-1">
+                      ${(monthlyRevenue.reduce((sum, item) => sum + item.revenue, 0) / monthlyRevenue.length).toLocaleString()}
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-1">+5.2% from last year</p>
+                  </CardContent>
+                </Card>
+                
+                <Card className="bg-muted/50">
+                  <CardContent className="p-4">
+                    <h4 className="font-medium">Revenue per Patient</h4>
+                    <div className="text-2xl font-bold mt-1">
+                      ${(monthlyRevenue.reduce((sum, item) => sum + item.revenue, 0) / 
+                         monthlyRevenue.reduce((sum, item) => sum + item.patients, 0)).toFixed(2)}
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-1">+3.1% from last year</p>
+                  </CardContent>
+                </Card>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+        
+        <TabsContent value="demographics">
+          <Card>
+            <CardHeader>
+              <CardTitle>Patient Demographics</CardTitle>
+              <CardDescription>
+                Age distribution of patients
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="h-[400px] flex justify-center">
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
                     <Pie
-                      data={hospitalizationData}
+                      data={patientDemographics}
                       cx="50%"
                       cy="50%"
                       labelLine={true}
-                      outerRadius={100}
+                      outerRadius={150}
                       fill="#8884d8"
                       dataKey="value"
                       label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
                     >
-                      {hospitalizationData.map((entry, index) => (
+                      {patientDemographics.map((entry, index) => (
                         <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                       ))}
                     </Pie>
-                    <Tooltip />
-                    <Legend />
+                    <Tooltip formatter={(value, name) => [`${value}%`, `Age ${name}`]} />
                   </PieChart>
                 </ResponsiveContainer>
+              </div>
+              
+              <div className="mt-6">
+                <h4 className="font-medium mb-3">Key Demographics Insights</h4>
+                <div className="space-y-2">
+                  <div className="p-3 bg-muted/50 rounded-lg">
+                    <h5 className="font-medium">Largest Patient Group</h5>
+                    <p className="text-sm">Adults aged 35-50 represent 30% of all patients</p>
+                  </div>
+                  <div className="p-3 bg-muted/50 rounded-lg">
+                    <h5 className="font-medium">Growing Demographic</h5>
+                    <p className="text-sm">Patients aged 18-34 increased by 8% compared to last year</p>
+                  </div>
+                  <div className="p-3 bg-muted/50 rounded-lg">
+                    <h5 className="font-medium">Demographic-specific Treatments</h5>
+                    <p className="text-sm">Elderly patients (66+) require 45% more specialized care</p>
+                  </div>
+                </div>
               </div>
             </CardContent>
           </Card>
         </TabsContent>
       </Tabs>
-
-      <div className="flex justify-end space-x-2 mt-8">
-        <Button variant="outline">Export as PDF</Button>
-        <Button variant="outline">Export as CSV</Button>
-        <Button>Generate Full Report</Button>
-      </div>
     </div>
   );
 };
