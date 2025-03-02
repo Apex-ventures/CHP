@@ -1,142 +1,207 @@
 
-import { useNavigate, useLocation } from 'react-router-dom';
-import { useAuth } from '@/context/AuthContext';
-import {
-  Sidebar as SidebarComponent,
-  SidebarContent,
-  SidebarFooter,
-  SidebarHeader,
-  SidebarMenu,
-  SidebarMenuItem,
-  SidebarMenuButton,
-} from '@/components/ui/sidebar';
+import React from 'react';
+import { Link } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
-import {
-  CalendarIcon,
-  ClipboardIcon,
-  HomeIcon,
-  LogOutIcon,
-  Settings2Icon,
-  UserIcon,
-  UsersIcon,
-  FileTextIcon,
-  BarChartIcon,
-  ClockIcon,
-  PillIcon,
-  PackageIcon,
-  MessageSquareIcon,
-  ShieldIcon,
-  DatabaseIcon,
-  ActivityIcon,
-  ListIcon,
-  HistoryIcon,
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { useAuth } from '@/context/AuthContext';
+import { 
+  Users, 
+  Calendar, 
+  ClipboardList, 
+  BarChart3, 
+  User, 
+  PanelLeft,
+  Home,
+  LucideIcon,
+  Pill,
+  PackageOpen,
+  FileText,
+  MessageSquare,
+  ShieldAlert,
+  Settings,
+  UserCog,
+  FileBarChart,
+  ActivityLog
 } from 'lucide-react';
 
-const Sidebar = () => {
-  const { user, logout } = useAuth();
-  const navigate = useNavigate();
+interface SidebarNavItemProps {
+  icon: LucideIcon;
+  title: string;
+  href: string;
+  disabled?: boolean;
+}
+
+const SidebarNavItem = ({ icon: Icon, title, href, disabled }: SidebarNavItemProps) => {
   const location = useLocation();
-
-  if (!user) return null;
-
-  const isActive = (path: string) => location.pathname === path;
-
-  const menuItems = {
-    patient: [
-      { icon: HomeIcon, label: 'Dashboard', path: '/dashboard' },
-      { icon: CalendarIcon, label: 'Appointments', path: '/appointments' },
-      { icon: FileTextIcon, label: 'Medical Records', path: '/medical-records' },
-      { icon: BarChartIcon, label: 'Reports', path: '/reports' },
-      { icon: UserIcon, label: 'Profile', path: '/profile' },
-    ],
-    receptionist: [
-      { icon: HomeIcon, label: 'Dashboard', path: '/dashboard' },
-      { icon: UsersIcon, label: 'Patients', path: '/patients' },
-      { icon: CalendarIcon, label: 'Appointments', path: '/appointments' },
-      { icon: ClockIcon, label: 'Schedule', path: '/schedule' },
-      { icon: UserIcon, label: 'Profile', path: '/profile' },
-    ],
-    clinician: [
-      { icon: HomeIcon, label: 'Dashboard', path: '/dashboard' },
-      { icon: UsersIcon, label: 'Patients', path: '/patients' },
-      { icon: CalendarIcon, label: 'Appointments', path: '/appointments' },
-      { icon: ClipboardIcon, label: 'Medical Records', path: '/medical-records' },
-      { icon: PillIcon, label: 'Prescriptions', path: '/prescriptions' },
-      { icon: BarChartIcon, label: 'Reports', path: '/reports' },
-      { icon: UserIcon, label: 'Profile', path: '/profile' },
-    ],
-    pharmacy: [
-      { icon: HomeIcon, label: 'Dashboard', path: '/dashboard' },
-      { icon: PillIcon, label: 'Medications', path: '/medications' },
-      { icon: PackageIcon, label: 'Inventory', path: '/inventory' },
-      { icon: ClipboardIcon, label: 'Prescriptions', path: '/prescriptions' },
-      { icon: MessageSquareIcon, label: 'Messages', path: '/messages' },
-      { icon: UserIcon, label: 'Profile', path: '/profile' },
-    ],
-    admin: [
-      { icon: HomeIcon, label: 'Admin Dashboard', path: '/admin' },
-      { icon: BarChartIcon, label: 'Hospital Statistics', path: '/admin/statistics' },
-      { icon: UsersIcon, label: 'User Management', path: '/admin/users' },
-      { icon: Settings2Icon, label: 'System Settings', path: '/admin/settings' },
-      { icon: HistoryIcon, label: 'Audit Logs', path: '/admin/audit' },
-      
-      // Access to all main parts of the system
-      { icon: DatabaseIcon, label: 'All Patients', path: '/patients' },
-      { icon: CalendarIcon, label: 'All Appointments', path: '/appointments' },
-      { icon: ClipboardIcon, label: 'Medical Records', path: '/medical-records' },
-      { icon: PillIcon, label: 'Medications', path: '/medications' },
-      { icon: PackageIcon, label: 'Inventory', path: '/inventory' },
-      { icon: FileTextIcon, label: 'Reports', path: '/reports' },
-      { icon: UserIcon, label: 'Profile', path: '/profile' },
-    ],
-  };
-
-  const roleItems = menuItems[user.role] || [];
+  const isActive = location.pathname === href || location.pathname.startsWith(`${href}/`);
 
   return (
-    <SidebarComponent>
-      <SidebarHeader className="py-6">
-        <div className="flex flex-col items-center space-y-2 px-4">
-          <div className="text-xl font-bold">MedicalApp</div>
-          <div className={cn('text-xs pill rounded-full px-2 py-1', {
-            'bg-blue-100 text-blue-800': user.role === 'patient',
-            'bg-purple-100 text-purple-800': user.role === 'receptionist',
-            'bg-green-100 text-green-800': user.role === 'clinician',
-            'bg-orange-100 text-orange-800': user.role === 'pharmacy',
-            'bg-red-100 text-red-800': user.role === 'admin',
-          })}>
-            {user.role.charAt(0).toUpperCase() + user.role.slice(1)}
-          </div>
-        </div>
-      </SidebarHeader>
-      <SidebarContent className="px-3 py-6">
-        <SidebarMenu>
-          {roleItems.map((item) => (
-            <SidebarMenuItem key={item.path}>
-              <SidebarMenuButton
-                className={cn({
-                  'bg-sidebar-accent text-sidebar-accent-foreground': isActive(item.path),
-                })}
-                onClick={() => navigate(item.path)}
-              >
-                <item.icon className="h-4 w-4 mr-3" />
-                <span>{item.label}</span>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          ))}
-        </SidebarMenu>
-      </SidebarContent>
-      <SidebarFooter className="p-4">
-        <SidebarMenuButton
-          onClick={logout}
-          className="w-full text-destructive hover:text-destructive hover:bg-destructive/10"
-        >
-          <LogOutIcon className="h-4 w-4 mr-3" />
-          <span>Log out</span>
-        </SidebarMenuButton>
-      </SidebarFooter>
-    </SidebarComponent>
+    <Link 
+      to={disabled ? '#' : href}
+      className={cn(
+        'flex items-center gap-3 rounded-lg px-3 py-2 transition-all',
+        isActive 
+          ? 'bg-primary text-primary-foreground' 
+          : 'hover:bg-muted text-muted-foreground hover:text-foreground',
+        disabled && 'pointer-events-none opacity-50'
+      )}
+    >
+      <Icon className="h-5 w-5" />
+      <span>{title}</span>
+    </Link>
   );
 };
 
-export default Sidebar;
+interface NavGroupProps {
+  title: string;
+  items: SidebarNavItemProps[];
+}
+
+const NavGroup = ({ title, items }: NavGroupProps) => {
+  return (
+    <div className="pb-4">
+      <h3 className="mb-2 px-4 text-sm font-semibold tracking-tight text-foreground">{title}</h3>
+      <div className="space-y-1 px-1">
+        {items.map((item, index) => (
+          <SidebarNavItem key={index} {...item} />
+        ))}
+      </div>
+    </div>
+  );
+};
+
+export const Sidebar = () => {
+  const { user } = useAuth();
+
+  // Common items for all users
+  const commonNavItems: SidebarNavItemProps[] = [
+    {
+      title: 'Dashboard',
+      href: '/dashboard',
+      icon: Home
+    },
+    {
+      title: 'Profile',
+      href: '/profile',
+      icon: User
+    }
+  ];
+  
+  // Patient management for clinicians and receptionists
+  const patientNavItems: SidebarNavItemProps[] = [
+    {
+      title: 'Patients',
+      href: '/patients',
+      icon: Users
+    },
+    {
+      title: 'Appointments',
+      href: '/appointments',
+      icon: Calendar
+    },
+    {
+      title: 'Medical Records',
+      href: '/medical-records',
+      icon: ClipboardList
+    }
+  ];
+
+  // Pharmacy items for pharmacy staff
+  const pharmacyNavItems: SidebarNavItemProps[] = [
+    {
+      title: 'Medications',
+      href: '/medications',
+      icon: Pill
+    },
+    {
+      title: 'Inventory',
+      href: '/inventory',
+      icon: PackageOpen
+    },
+    {
+      title: 'Prescriptions',
+      href: '/prescriptions',
+      icon: FileText
+    },
+    {
+      title: 'Messages',
+      href: '/messages',
+      icon: MessageSquare
+    }
+  ];
+  
+  // Admin items for administrators
+  const adminNavItems: SidebarNavItemProps[] = [
+    {
+      title: 'Admin Dashboard',
+      href: '/admin',
+      icon: ShieldAlert
+    },
+    {
+      title: 'Hospital Statistics',
+      href: '/admin/statistics',
+      icon: FileBarChart
+    },
+    {
+      title: 'User Management',
+      href: '/admin/users',
+      icon: UserCog
+    },
+    {
+      title: 'System Settings',
+      href: '/admin/settings',
+      icon: Settings
+    },
+    {
+      title: 'Audit Logs',
+      href: '/admin/audit',
+      icon: ActivityLog
+    }
+  ];
+
+  // Common for all users
+  const reportingNavItems: SidebarNavItemProps[] = [
+    {
+      title: 'Reports',
+      href: '/reports',
+      icon: BarChart3
+    }
+  ];
+
+  return (
+    <div className="hidden border-r bg-background lg:block">
+      <div className="flex flex-col gap-2 h-[calc(100vh-3.5rem)]">
+        <div className="flex h-14 items-center border-b px-4">
+          <Link to="/" className="flex items-center gap-2 font-semibold">
+            <PanelLeft className="h-6 w-6" />
+            <span>Medical App</span>
+          </Link>
+        </div>
+        <ScrollArea className="flex-1 px-4 py-3">
+          <NavGroup title="Navigation" items={commonNavItems} />
+          
+          {/* Show patient management for clinicians and receptionists */}
+          {(user?.role === 'clinician' || user?.role === 'receptionist' || user?.role === 'admin') && (
+            <NavGroup title="Patient Management" items={patientNavItems} />
+          )}
+          
+          {/* Show pharmacy items for pharmacy staff */}
+          {(user?.role === 'pharmacy' || user?.role === 'admin') && (
+            <NavGroup title="Pharmacy" items={pharmacyNavItems} />
+          )}
+          
+          {/* Show admin section for administrators */}
+          {user?.role === 'admin' && (
+            <NavGroup title="Administration" items={adminNavItems} />
+          )}
+          
+          {/* Reports available to all staff */}
+          {user?.role !== 'patient' && (
+            <NavGroup title="Reporting" items={reportingNavItems} />
+          )}
+        </ScrollArea>
+      </div>
+    </div>
+  );
+};
