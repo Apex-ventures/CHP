@@ -10,7 +10,6 @@ export interface QueueItem {
   status: 'waiting' | 'processing' | 'completed' | 'cancelled';
   assignedDoctor?: string;
   notes?: string;
-  estimatedWaitTime?: number; // wait time in minutes
 }
 
 export interface QueueFilter {

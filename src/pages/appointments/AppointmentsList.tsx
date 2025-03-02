@@ -3,24 +3,14 @@ import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
-import { Link, useNavigate } from "react-router-dom";
-import { 
-  Calendar, 
-  Clock, 
-  User, 
-  X, 
-  Edit, 
-  FileText, 
-  CalendarRange 
-} from 'lucide-react';
+import { Link } from "react-router-dom";
 
 const AppointmentsList = () => {
   const { toast } = useToast();
-  const navigate = useNavigate();
   const [appointments, setAppointments] = useState([
-    { id: 1, patientId: "1", patientName: "John Doe", date: "2023-06-10", time: "09:00 AM", status: "Scheduled", type: "Regular Check-up" },
-    { id: 2, patientId: "2", patientName: "Jane Smith", date: "2023-06-12", time: "11:30 AM", status: "Completed", type: "Follow-up" },
-    { id: 3, patientId: "3", patientName: "Robert Johnson", date: "2023-06-15", time: "02:00 PM", status: "Cancelled", type: "Specialist Consultation" },
+    { id: 1, patientName: "John Doe", date: "2023-06-10", time: "09:00 AM", status: "Scheduled" },
+    { id: 2, patientName: "Jane Smith", date: "2023-06-12", time: "11:30 AM", status: "Completed" },
+    { id: 3, patientName: "Robert Johnson", date: "2023-06-15", time: "02:00 PM", status: "Cancelled" },
   ]);
 
   const handleCancelAppointment = (id: number) => {
@@ -32,10 +22,6 @@ const AppointmentsList = () => {
       title: "Appointment Cancelled",
       description: "The appointment has been cancelled successfully.",
     });
-  };
-
-  const handleViewPatient = (patientId: string) => {
-    navigate(`/patients/${patientId}`);
   };
 
   return (
@@ -67,32 +53,11 @@ const AppointmentsList = () => {
             </CardHeader>
             <CardContent className="pt-4">
               <div className="space-y-2">
-                <div className="flex items-center">
-                  <Calendar className="h-4 w-4 mr-2 text-muted-foreground" />
-                  <p>{appointment.date}</p>
-                </div>
-                <div className="flex items-center">
-                  <Clock className="h-4 w-4 mr-2 text-muted-foreground" />
-                  <p>{appointment.time}</p>
-                </div>
-                <div className="flex items-center">
-                  <CalendarRange className="h-4 w-4 mr-2 text-muted-foreground" />
-                  <p>{appointment.type}</p>
-                </div>
+                <p><strong>Date:</strong> {appointment.date}</p>
+                <p><strong>Time:</strong> {appointment.time}</p>
                 <div className="flex space-x-2 mt-4">
-                  <Button 
-                    variant="outline" 
-                    className="flex-1"
-                    onClick={() => handleViewPatient(appointment.patientId)}
-                  >
-                    <User className="h-4 w-4 mr-1" />
-                    Patient
-                  </Button>
                   <Link to={`/appointments/${appointment.id}`} className="flex-1">
-                    <Button variant="outline" className="w-full">
-                      <Edit className="h-4 w-4 mr-1" />
-                      Edit
-                    </Button>
+                    <Button variant="outline" className="w-full">View/Edit</Button>
                   </Link>
                   {appointment.status === 'Scheduled' && (
                     <Button 
@@ -100,19 +65,10 @@ const AppointmentsList = () => {
                       onClick={() => handleCancelAppointment(appointment.id)}
                       className="flex-1"
                     >
-                      <X className="h-4 w-4 mr-1" />
                       Cancel
                     </Button>
                   )}
                 </div>
-                <Button 
-                  variant="ghost" 
-                  className="w-full mt-2 text-blue-600"
-                  onClick={() => navigate(`/medical-records`)}
-                >
-                  <FileText className="h-4 w-4 mr-1" />
-                  View Medical Records
-                </Button>
               </div>
             </CardContent>
           </Card>

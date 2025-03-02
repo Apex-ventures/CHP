@@ -1,7 +1,7 @@
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { formatDistanceToNow, addMinutes, differenceInMinutes } from 'date-fns';
+import { formatDistanceToNow } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -18,9 +18,7 @@ import {
   CheckCircle2, 
   XCircle,
   RotateCw,
-  Filter,
-  Calendar,
-  History
+  Filter
 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { QueueItem, QueueFilter } from '@/types/queue';
@@ -84,14 +82,6 @@ const mockQueueItems: QueueItem[] = [
   },
 ];
 
-// Constants for wait time calculations
-const WAIT_TIME_PER_PATIENT = 5; // minutes per patient
-const PRIORITY_MULTIPLIERS = {
-  normal: 1,
-  urgent: 0.7,
-  emergency: 0.3
-};
-
 const PatientQueue = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -107,46 +97,6 @@ const PatientQueue = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [currentTab, setCurrentTab] = useState('all');
   const [nextQueueNumber, setNextQueueNumber] = useState(6); // Starting from 6 since we have 5 mock items
-  const [queueDate, setQueueDate] = useState<string>(new Date().toLocaleDateString());
-
-  // Calculate estimated wait time for a patient
-  const calculateWaitTime = useCallback((item: QueueItem, queue: QueueItem[]) => {
-    // If the patient is not waiting, don't calculate wait time
-    if (item.status !== 'waiting') return 0;
-    
-    // Get all waiting patients ahead in the queue
-    const waitingAhead = queue.filter(qItem => 
-      qItem.status === 'waiting' && 
-      qItem.queueNumber < item.queueNumber
-    );
-    
-    // Calculate base wait time (5 minutes per patient)
-    let waitTime = waitingAhead.length * WAIT_TIME_PER_PATIENT;
-    
-    // Adjust for priority
-    waitingAhead.forEach(patient => {
-      // Higher priority patients reduce wait time for those behind them
-      const multiplier = PRIORITY_MULTIPLIERS[patient.priority];
-      waitTime *= multiplier;
-    });
-    
-    // Emergency patients get seen sooner
-    if (item.priority === 'emergency') {
-      waitTime = Math.max(0, Math.floor(waitTime * 0.3));
-    } else if (item.priority === 'urgent') {
-      waitTime = Math.max(0, Math.floor(waitTime * 0.7));
-    }
-    
-    // Ensure a minimum wait time
-    return Math.max(WAIT_TIME_PER_PATIENT, Math.ceil(waitTime));
-  }, []);
-
-  // Update wait times for all patients
-  const updateWaitTimes = useCallback(() => {
-    // Only update wait times for waiting patients
-    const updatedQueue = [...queueItems];
-    setQueueItems(updatedQueue);
-  }, [queueItems]);
 
   // Simulating loading queue data
   useEffect(() => {
@@ -154,12 +104,6 @@ const PatientQueue = () => {
       try {
         // Simulate API call
         await new Promise(resolve => setTimeout(resolve, 1000));
-        
-        // In a real app, we would reset the queue at the start of each new day
-        // and fetch the current day's queue
-        const today = new Date().toLocaleDateString();
-        setQueueDate(today);
-        
         setQueueItems(mockQueueItems);
         setFilteredItems(mockQueueItems);
       } catch (error) {
@@ -174,15 +118,14 @@ const PatientQueue = () => {
     };
 
     fetchQueue();
-    
     // In a real app, we would refresh this data periodically
     const interval = setInterval(() => {
-      // Update wait times every minute
-      updateWaitTimes();
-    }, 60000);
+      // Update wait times
+      setQueueItems(prevItems => [...prevItems]);
+    }, 60000); // Update every minute
 
     return () => clearInterval(interval);
-  }, [toast, updateWaitTimes]);
+  }, [toast]);
 
   // Apply filters
   useEffect(() => {
@@ -217,12 +160,8 @@ const PatientQueue = () => {
       queueNumber: nextQueueNumber,
     };
     
-    const updatedQueue = [...queueItems, queueItem];
-    setQueueItems(updatedQueue);
+    setQueueItems(prev => [...prev, queueItem]);
     setNextQueueNumber(nextQueueNumber + 1);
-    
-    // After adding a new patient, update wait times for all waiting patients
-    updateWaitTimes();
     
     toast({
       title: 'Patient added to queue',
@@ -237,16 +176,13 @@ const PatientQueue = () => {
     
     const doctorName = user.name || 'Dr. ' + user.email?.split('@')[0];
     
-    const updatedQueue = queueItems.map(qItem =>
-      qItem.id === item.id
-        ? { ...qItem, status: 'processing', assignedDoctor: doctorName }
-        : qItem
+    setQueueItems(prev =>
+      prev.map(qItem =>
+        qItem.id === item.id
+          ? { ...qItem, status: 'processing', assignedDoctor: doctorName }
+          : qItem
+      )
     );
-    
-    setQueueItems(updatedQueue);
-    
-    // After processing a patient, update wait times for all waiting patients
-    updateWaitTimes();
     
     toast({
       title: 'Patient assigned',
@@ -255,14 +191,11 @@ const PatientQueue = () => {
   };
 
   const handleMarkComplete = (item: QueueItem) => {
-    const updatedQueue = queueItems.map(qItem =>
-      qItem.id === item.id ? { ...qItem, status: 'completed' } : qItem
+    setQueueItems(prev =>
+      prev.map(qItem =>
+        qItem.id === item.id ? { ...qItem, status: 'completed' } : qItem
+      )
     );
-    
-    setQueueItems(updatedQueue);
-    
-    // After completing a patient, update wait times for all waiting patients
-    updateWaitTimes();
     
     toast({
       title: 'Patient completed',
@@ -331,29 +264,12 @@ const PatientQueue = () => {
     }
   };
 
-  const renderWaitTime = (item: QueueItem) => {
-    if (item.status !== 'waiting') {
-      try {
-        return formatDistanceToNow(new Date(item.arrivalTime), { addSuffix: true });
-      } catch (error) {
-        return 'Unknown';
-      }
+  const renderWaitTime = (arrivalTime: string) => {
+    try {
+      return formatDistanceToNow(new Date(arrivalTime), { addSuffix: true });
+    } catch (error) {
+      return 'Unknown';
     }
-    
-    // For waiting patients, show estimated wait time
-    const waitMinutes = calculateWaitTime(item, queueItems);
-    const estimatedTime = addMinutes(new Date(), waitMinutes);
-    
-    return (
-      <div className="flex flex-col">
-        <span className="text-xs">
-          Arrived: {formatDistanceToNow(new Date(item.arrivalTime), { addSuffix: true })}
-        </span>
-        <span className="text-xs font-medium text-amber-700">
-          Est. wait: ~{waitMinutes} min
-        </span>
-      </div>
-    );
   };
 
   return (
@@ -362,7 +278,7 @@ const PatientQueue = () => {
         <div>
           <h1 className="text-2xl font-bold">Patient Queue</h1>
           <p className="text-muted-foreground">
-            Daily Queue: {queueDate} | Total: {queueItems.length} patients
+            Manage the daily patient queue and track status
           </p>
         </div>
         {(user?.role === 'receptionist' || user?.role === 'clinician') && (
@@ -432,7 +348,7 @@ const PatientQueue = () => {
                         'bg-gray-50'}
                     `}>
                       <CardTitle className="flex justify-between items-center">
-                        <span className="text-xl font-bold">#{item.queueNumber}</span>
+                        <span>#{item.queueNumber}</span>
                         {renderStatusBadge(item.status)}
                       </CardTitle>
                       <CardDescription className="font-medium text-lg text-foreground">
@@ -442,7 +358,7 @@ const PatientQueue = () => {
                         {renderPriorityBadge(item.priority)}
                         <span className="text-xs text-muted-foreground flex items-center">
                           <Clock className="h-3 w-3 mr-1" /> 
-                          {renderWaitTime(item)}
+                          {renderWaitTime(item.arrivalTime)}
                         </span>
                       </div>
                     </CardHeader>
@@ -469,21 +385,9 @@ const PatientQueue = () => {
                           onClick={() => handleViewPatient(item.patientId)}
                         >
                           <User className="h-4 w-4 mr-1" />
-                          Patient Details
+                          View Details
                         </Button>
                         
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
-                          className="flex-1"
-                          onClick={() => navigate(`/appointments`)}
-                        >
-                          <Calendar className="h-4 w-4 mr-1" />
-                          Appointments
-                        </Button>
-                      </div>
-                      
-                      <div className="w-full flex space-x-2">
                         {user?.role === 'clinician' && item.status === 'waiting' && (
                           <Button 
                             variant="default" 
@@ -508,17 +412,6 @@ const PatientQueue = () => {
                             Complete
                           </Button>
                         )}
-                        
-                        {/* Medical history button */}
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
-                          className="flex-1"
-                          onClick={() => navigate(`/medical-records`)}
-                        >
-                          <History className="h-4 w-4 mr-1" />
-                          Medical History
-                        </Button>
                       </div>
                     </CardFooter>
                   </Card>
