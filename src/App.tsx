@@ -20,6 +20,7 @@ import NotFound from "@/pages/NotFound";
 import PatientsList from "@/pages/patients/PatientsList";
 import PatientDetails from "@/pages/patients/PatientDetails";
 import PatientForm from "@/pages/patients/PatientForm";
+import PatientQueue from "@/pages/patient-queue/PatientQueue";
 
 // Appointment Pages
 import AppointmentsList from "@/pages/appointments/AppointmentsList";
@@ -74,6 +75,9 @@ const App = () => (
               <Route path="/patients/new" element={<PatientForm />} />
               <Route path="/patients/:id" element={<PatientDetails />} />
               <Route path="/patients/:id/edit" element={<PatientForm />} />
+              
+              {/* Patient Queue */}
+              <Route path="/patient-queue" element={<PatientQueue />} />
               
               {/* Appointment Routes */}
               <Route path="/appointments" element={<AppointmentsList />} />

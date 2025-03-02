@@ -22,7 +22,7 @@ import {
   Settings,
   UserCog,
   FileBarChart,
-  ActivityLog
+  Activity
 } from 'lucide-react';
 
 interface SidebarNavItemProps {
@@ -104,6 +104,11 @@ export const Sidebar = () => {
       title: 'Medical Records',
       href: '/medical-records',
       icon: ClipboardList
+    },
+    {
+      title: 'Patient Queue',
+      href: '/patient-queue',
+      icon: ClipboardList
     }
   ];
 
@@ -156,7 +161,7 @@ export const Sidebar = () => {
     {
       title: 'Audit Logs',
       href: '/admin/audit',
-      icon: ActivityLog
+      icon: Activity
     }
   ];
 

@@ -1,48 +1,31 @@
 
 import { useEffect } from 'react';
-import { Outlet, useNavigate } from 'react-router-dom';
+import { Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
-import { SidebarProvider } from '@/components/ui/sidebar';
-import Navbar from '@/components/layout/Navbar';
-import Sidebar from '@/components/layout/Sidebar';
-import PageTransition from '@/components/ui/PageTransition';
+import Navbar from './Navbar';
+import { Sidebar } from './Sidebar';
 
 const Layout = () => {
-  const { user, isAuthenticated, isLoading } = useAuth();
-  const navigate = useNavigate();
+  const { pathname } = useLocation();
+  const { isAuthenticated, user } = useAuth();
 
+  // Scroll to top on route change
   useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
-      navigate('/login');
-    }
-  }, [isAuthenticated, isLoading, navigate]);
+    window.scrollTo(0, 0);
+  }, [pathname]);
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-pulse text-2xl">Loading...</div>
-      </div>
-    );
-  }
-
-  if (!isAuthenticated) {
-    return null;
-  }
+  // If user is not authenticated, they will be redirected in AuthContext
 
   return (
-    <SidebarProvider>
-      <div className="min-h-screen flex w-full">
-        <Sidebar />
-        <div className="flex-1 flex flex-col min-h-screen">
-          <Navbar />
-          <main className="flex-1 pt-16">
-            <PageTransition className="page-container">
-              <Outlet />
-            </PageTransition>
-          </main>
-        </div>
+    <div className="flex h-screen w-full bg-background">
+      <Sidebar />
+      <div className="flex flex-col flex-1 overflow-hidden">
+        <Navbar />
+        <main className="flex-1 overflow-y-auto p-4 md:p-6">
+          <Outlet />
+        </main>
       </div>
-    </SidebarProvider>
+    </div>
   );
 };
 
