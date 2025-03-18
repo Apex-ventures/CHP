@@ -13,6 +13,7 @@ import AuthLayout from "@/components/layout/AuthLayout";
 // Pages
 import Index from "@/pages/Index";
 import Login from "@/pages/Login";
+import SignUp from "@/pages/Signup"
 import Dashboard from "@/pages/Dashboard";
 import NotFound from "@/pages/NotFound";
 
@@ -61,6 +62,9 @@ const App = () => (
             <Route path="/" element={<Index />} />
             
             {/* Auth Routes */}
+            <Route>
+              <Route path="/signup" element={<SignUp />} />
+            </Route>
             <Route element={<AuthLayout />}>
               <Route path="/login" element={<Login />} />
             </Route>

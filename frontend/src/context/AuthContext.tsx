@@ -1,13 +1,14 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { supabase } from "@/lib/supabase";
 
 export type UserRole = 'patient' | 'receptionist' | 'clinician' | 'pharmacy' | 'admin';
 
 export interface User {
   id: string;
   name: string;
-  email: string;
-  role: UserRole;
+  email?: string;
+  role?: UserRole;
   profileImage?: string;
 }
 
@@ -77,18 +78,40 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setIsLoading(true);
     try {
       // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Find user by email (password is not checked in this demo)
-      const foundUser = mockUsers.find(u => u.email === email);
-      
-      if (!foundUser) {
-        throw new Error('Invalid credentials');
+      const response = await supabase.auth.signInWithPassword({
+        email,
+        password
+      });
+      console.log(JSON.stringify(response))
+      if (response.error) {
+          console.error("Error logging in:", response.error);
+          return;
       }
-      
-      // Store user in state and localStorage
-      setUser(foundUser);
-      localStorage.setItem('medicalAppUser', JSON.stringify(foundUser));
+
+    const foundUser = response.data.user;
+    console.log("User logged in:", foundUser);
+
+    if (!foundUser) {
+      throw new Error("Invalid credentials");
+    }
+
+    // Extract role from user metadata (assuming it's stored there)
+    const userRole = foundUser.role as UserRole | undefined;
+
+    // Store user in state and localStorage with validated role
+    //**Need to change this. Just a hack**
+    const authenticatedUser: User = {
+      ...foundUser,
+      role: userRole && ["patient", "receptionist", "clinician", "pharmacy", "admin"].includes(userRole)
+        ? userRole
+        : "admin", // Ensure role is valid
+      name: foundUser.user_metadata?.name || "Guest",
+      id: foundUser.id
+      // profileImage: foundUser.user_metadata?.profileImage || "https://i.pravatar.cc/150",
+    };
+
+    setUser(authenticatedUser);
+    localStorage.setItem("medicalAppUser", JSON.stringify(authenticatedUser));
     } catch (error) {
       console.error('Login error:', error);
       throw error;
