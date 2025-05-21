@@ -41,6 +41,7 @@ const mockPatients = {
     emergencyContact: 'Mary Smith',
     emergencyPhone: '(555) 987-6543',
     notes: 'Patient has a history of hypertension.',
+    shin: 'XYZ789',
   },
   // Add more patients as needed
 };
@@ -58,6 +59,7 @@ const formSchema = z.object({
   emergencyContact: z.string().min(2, { message: 'Emergency contact name is required.' }),
   emergencyPhone: z.string().min(10, { message: 'Emergency phone must be at least 10 digits.' }),
   notes: z.string().optional(),
+  shin: z.string().optional(),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -83,6 +85,7 @@ const PatientForm = () => {
       emergencyContact: '',
       emergencyPhone: '',
       notes: '',
+ shin: '',
     },
   });
 
@@ -108,6 +111,7 @@ const PatientForm = () => {
               emergencyContact: patient.emergencyContact,
               emergencyPhone: patient.emergencyPhone,
               notes: patient.notes,
+ shin: patient.shin,
             });
           } else {
             toast({
@@ -133,11 +137,38 @@ const PatientForm = () => {
   }, [id, navigate, toast, form]);
 
   const onSubmit = async (data: FormValues) => {
+    if (isEditMode) {
+      // Handle update logic if needed in the future, currently not implemented in backend
+      toast({
+        title: 'Update functionality not implemented',
+        description: 'Patient update is not yet supported via the API.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
     setIsLoading(true);
-    
+
     try {
-      // Simulate API call to save patient data
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      // Replace with your actual backend API URL
+      const apiUrl = 'http://localhost:3000/api/v1/enroll-patient';
+
+      // **IMPORTANT:** Replace 'YOUR_AUTH_TOKEN' with a valid authentication token
+      // In a real application, you would obtain this token after a user logs in.
+      const authToken = 'YOUR_AUTH_TOKEN';
+
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${authToken}`,
+        },
+        body: JSON.stringify(data),
+      });
+
+      if (!response.ok) {
+        throw new Error(`API request failed with status ${response.status}`);
+      }
       
       toast({
         title: isEditMode ? 'Patient updated' : 'Patient created',
@@ -147,7 +178,7 @@ const PatientForm = () => {
       });
       
       navigate('/patients');
-    } catch (error) {
+    } catch (error: any) {
       toast({
         variant: 'destructive',
         title: 'Error',
@@ -354,6 +385,20 @@ const PatientForm = () => {
                     </FormItem>
                   )}
                 />
+
+ <FormField
+ control={form.control}
+ name="shin"
+ render={({ field }) => (
+ <FormItem>
+ <FormLabel>SHIN</FormLabel>
+ <FormControl>
+ <Input placeholder="Patient's SHIN identifier" {...field} />
+ </FormControl>
+ <FormMessage />
+ </FormItem>
+ )}
+ />
               </div>
 
               <div className="flex justify-end space-x-2">
@@ -379,6 +424,9 @@ const PatientForm = () => {
                   )}
                 </Button>
               </div>
+ <Button type="button" variant="secondary" className="w-full md:w-auto">
+ Assign New Card
+ </Button>
             </form>
           </Form>
         </CardContent>
